@@ -1,7 +1,8 @@
 # kurier
 
-> My neat app
 
+
+>Electron Client Application setup:
 
 ## Dev
 
@@ -23,6 +24,15 @@ $ npm run build
 
 Builds the app for macOS, Linux, and Windows, using [electron-packager](https://github.com/electron-userland/electron-packager).
 
+
+Feature list: 
+
+Desktop applications for:
+- MacOS 
+- Windows 
+- Linux 
+
+Central Server running node.js using mongodb
 
 ## License
 

@@ -25,3 +25,21 @@ header h1 {
 	margin: 0;
 	padding: 0;
 }
+
+main {
+	font-size: 18px;
+	font-weight: 100;
+	margin: 0;
+	padding: 0;
+}
+
+main h2 {
+	position: absolute;
+	width: 500px;
+	height: 250px;
+	top: 50%;
+	left: 50%;
+	margin-top: -125px;
+	margin-left: -250px;
+	text-align: center;
+}
