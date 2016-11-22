@@ -32,7 +32,7 @@ Desktop applications for:
 - Windows 
 - Linux 
 
-Central Server running node.js using mongodb
+Central Server running node.js
 
 ## License
 

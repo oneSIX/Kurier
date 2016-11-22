@@ -2,7 +2,7 @@
   "name": "kurier",
   "productName": "Kurier",
   "version": "0.0.0",
-  "description": "My neat app",
+  "description": "Peer to peer chat app built for CIS 457 datacom",
   "license": "MIT",
   "repository": "oneSIX/kurier",
   "author": {
@@ -18,8 +18,7 @@
   "files": [
     "index.js",
     "index.html",
-    "index.css",
-    "renderer.js"
+    "index.css"
   ],
   "keywords": [
     "electron-app",
