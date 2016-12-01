@@ -1,0 +1,31 @@
+{
+  "name": "kurier",
+  "version": "1.0.0",
+  "description": "Server for Desktop Messenger Program",
+  "main": "index.js",
+  "dependencies": {
+    "bluebird": "^3.4.6",
+    "body-parser": "^1.15.2",
+    "express": "^4.14.0",
+    "lodash": "^4.17.2",
+    "mongodb": "^2.2.11",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oneSIX/Kurier.git"
+  },
+  "keywords": [
+    "kurier"
+  ],
+  "author": "Andrew Prins, Kent Sinclair, Tanner Gibson",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/oneSIX/Kurier/issues"
+  },
+  "homepage": "https://github.com/oneSIX/Kurier#readme"
+}
