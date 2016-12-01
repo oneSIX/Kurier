@@ -48,12 +48,12 @@ app.on('ready', () => {
 // the same time on one machine.
 
 // might not actually need this.
-function makeSingleInstance(){
-	if(process.mas) return false
+function makeSingleInstance() {
+	if (process.mas) return false
 
-	return app.makeSingleInstance(function () {
-		if(mainWindow) {
-			if(mainWindow.isMinimized()) mainWindow.restore()
+	return app.makeSingleInstance(function() {
+		if (mainWindow) {
+			if (mainWindow.isMinimized()) mainWindow.restore()
 			mainWindow.focus()
 		}
 	})
