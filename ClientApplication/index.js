@@ -17,10 +17,10 @@ function onClosed() {
 
 function createMainWindow() {
 	const win = new electron.BrowserWindow({
-		width: 600,
-		height: 400
+		x: 0,
+		y: 0
 	});
-
+	win.maximize();
 	win.loadURL(`file://${__dirname}/index.html`);
 	win.on('closed', onClosed);
 
@@ -42,3 +42,19 @@ app.on('activate', () => {
 app.on('ready', () => {
 	mainWindow = createMainWindow();
 });
+
+
+// Make this a single instance app, you can not have multiple versions of the client running at
+// the same time on one machine.
+
+// might not actually need this.
+function makeSingleInstance(){
+	if(process.mas) return false
+
+	return app.makeSingleInstance(function () {
+		if(mainWindow) {
+			if(mainWindow.isMinimized()) mainWindow.restore()
+			mainWindow.focus()
+		}
+	})
+}
