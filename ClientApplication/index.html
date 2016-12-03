@@ -1,28 +1,33 @@
 <!doctype html>
 <html>
-	<head>
-		<meta charset="utf-8">
 
-		<title>Kurier Application</title>
-		<link rel="stylesheet" href="index.css">
-	</head>
-	<body>
-		<div class="container">
-			<header>
-				<h1>Kurier</h1>
-			</header>
+<head>
+	<meta charset="utf-8">
 
-			<div class="main">
-				<h2>
+	<title>Kurier Chat</title>
+	<link rel="stylesheet" href="index.css">
+</head>
+
+<body>
+	<div class="container">
+		<header>
+			<h1>Kurier</h1>
+		</header>
+
+		<div class="main">
+			<h2>
 				<div id=chatlog></div>
-				<button type="button" id="send-button" class="nav-button">Send</button>
-				<input type="text" id="message">
-				</h2>
-			</div>
-		</div>
+				<input id="chat-input" type="text" placeholder="speak up!" autofocus/>
 
-		<script>
-			require('./renderer-process/chat.js')
-		</script>		
-	</body>
+
+				<button type="button" id="send-button" class="nav-button">Send</button>
+				</h2>
+		</div>
+	</div>
+
+	<script>
+		require('./renderer-process/chat.js')
+	</script>
+</body>
+
 </html>
