@@ -3,6 +3,21 @@
 
 <head>
 	<meta charset="utf-8">
+	<script>
+		if (typeof module === 'object') {
+			window.module = module;
+			module = undefined;
+		}
+	</script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="renderer-process/chat.js"></script>
+
+	<script>
+		if (window.module) module = window.module;
+	</script>
 
 	<title>Kurier Chat</title>
 	<link rel="stylesheet" href="index.css">
@@ -12,22 +27,22 @@
 	<div class="container">
 		<header>
 			<h1>Kurier</h1>
-		</header>
-
-		<div class="main">
-			<h2>
-				<div id=chatlog></div>
-				<input id="chat-input" type="text" placeholder="speak up!" autofocus/>
 
 
-				<button type="button" id="send-button" class="nav-button">Send</button>
-				</h2>
-		</div>
+
+		<form id="login" style="margin-top:40px">
+			<div class="input-group">
+				<input class="form-control" type="text" placeholder="Username" name="username">
+				<span class="input-group-btn">
+			<button type="submit" class="btn btn-primary">Login</button>
+		</span>
+			</div>
+		</form>
+</header>
+
 	</div>
 
-	<script>
-		require('./renderer-process/chat.js')
-	</script>
+
 </body>
 
 </html>
