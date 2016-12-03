@@ -10,7 +10,7 @@ var _ = require('lodash'),
     wss, db, usersdb, messagesdb;
 
 function mongoConnect(){
-  return new Promise(resolve, reject){
+  return new Promise(function(resolve, reject){
     MongoClient.connect(url, function(err, ndb) {
       if(err == null){
         db = ndb;
@@ -27,7 +27,7 @@ function mongoConnect(){
         reject(err);
       }
     });
-  }
+  });
 }
 
 mongoConnect().then(function(){
@@ -215,7 +215,7 @@ mongoConnect().then(function(){
         }else{
           threads.push({
             from: message.from,
-            to: message.to:
+            to: message.to,
             messages: [message]
           });
         }
@@ -230,7 +230,7 @@ mongoConnect().then(function(){
         }else{
           threads.push({
             from: message.from,
-            to: message.to:
+            to: message.to,
             messages: [message]
           });
         }
