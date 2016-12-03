@@ -33,7 +33,7 @@ function mongoConnect() {
 mongoConnect().then(function() {
 	// Get Users
 	getUsers().then(function(u) {
-		_.each(users, function(user) {
+		_.each(u, function(user) {
 			user.ws = [];
 		});
 		users = u;
@@ -59,10 +59,10 @@ mongoConnect().then(function() {
 		});
 
 		if (!user) {
-			ws.send('{type:"error",content:"Not a valid user"}');
+			ws.send(JSON.stringify({type:"error",content:"Not a valid user"}));
 		} else {
 			user.ws.push(ws);
-			ws.send('{type: "success", content: "you are connected"}');
+			ws.send(JSON.stringify({type: "success", content: "you are connected"}));
 			/*ws.on('message', function incoming(message) {
 			  console.log('received: %s', message);
 			  Promise.try(function(){
