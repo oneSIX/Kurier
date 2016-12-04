@@ -1,5 +1,6 @@
 // pass login request to Server -- returns ID used to login
 var user;
+var activeUser_id = null;
 var ws;
 
 var users = [];
@@ -15,8 +16,28 @@ $(function() {
 
 		login(username);
 	});
+  $('#message-box').submit(function(e) {
+		e.preventDefault();
+
+		var form = $(this);
+		var msg = $("input[name=message]").val();
+
+		sendMsg(msg);
+	});
 })
 
+function sendMsg(msg) {
+  $.ajax({
+    type: 'POST',
+		url: 'http://localhost:3000/login',
+		contentType: 'application/json',
+		data: JSON.stringify({
+			from: user._id,
+      to: toUser._id,
+      message: msg
+		}),
+  })
+}
 
 function login(userName) {
 
@@ -76,9 +97,15 @@ function showChat() {
 	console.log(users, threads);
   var html = '';
   _.each(users, function(user){
-    html+= '<div class="row"><div class="col-md-4"><i class="fa fa-user"></i></div><div class="col-md-8">'+user.name+'</div></div>';
+    html+= '<div class="row user" data-id="'+user._id+'"><div class="col-md-4"><i class="fa fa-user"></i></div><div class="col-md-8">'+user.name+'</div></div>';
   })
   $('#user-window').html(html);
+  $('.user').click(function(){
+    var box = $(this);
+    activeUser_id= box.data('id');
+    $('.user').removeClass('active');
+    box.addClass('active');
+  })
   $('#login-container').addClass("hidden");
   $('#main-window').removeClass("hidden");
 }

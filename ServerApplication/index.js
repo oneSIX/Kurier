@@ -258,7 +258,7 @@ mongoConnect().then(function() {
 			var result = [];
 			_.each(users, function(user) {
 				result.push({
-					id: user.id,
+					_id: user._id,
 					name: user.name
 				});
 			});
