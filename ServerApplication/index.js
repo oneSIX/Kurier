@@ -110,7 +110,6 @@ mongoConnect().then(function() {
 
 	*****************************/
 	app.post('/login', function(req, res) {
-		console.log(req.body)
 		Promise.try(function() {
 			if (_.get(req, 'body.name', null) == null) {
 				throw new Error('Name is required');
@@ -140,6 +139,7 @@ mongoConnect().then(function() {
 	    {to: *id*, from: *id*, message: 'string'}
 	****************/
 	app.post('/message/', function(req, res) {
+		var message;
 		Promise.try(function() {
 			if (_.get(req, 'body.to', null) == null) {
 				throw new Error('Sender (to) is required');
@@ -162,25 +162,29 @@ mongoConnect().then(function() {
 				throw new Error('Receiving User not Found');
 			}
 
-			return addMessage({
+			message = {
 				from: req.body.from,
 				to: req.body.to,
 				message: req.body.message
-			});
+			};
+
+			return addMessage(message);
 		}).then(function() {
 			// Find users (for ws connections)
 			var fromUser = _.find(users, function(user) {
-				return user._id === req.body.from;
+				return user._id == req.body.from;
 			});
 			var toUser = _.find(users, function(user) {
-				return user._id === req.body.from;
+				return user._id == req.body.to;
 			});
+
+			message.type = 'message';
 
 			// Publish via WS
 			_.each(fromUser.ws, function(ws) {
 				ws.send(JSON.stringify(message));
 			});
-			_.each(fromUser.ws, function(ws) {
+			_.each(toUser.ws, function(ws) {
 				ws.send(JSON.stringify(message));
 			});
 
@@ -213,30 +217,28 @@ mongoConnect().then(function() {
 			var threads = [];
 			_.each(recieved, function(message) {
 				var thread = _.find(threads, function(thread) {
-					return (thread.from == message.from);
+					return (thread.user == message.from);
 				});
 
 				if (thread) {
 					thread.messages.push(message);
 				} else {
 					threads.push({
-						from: message.from,
-						to: message.to,
+						user: message.from,
 						messages: [message]
 					});
 				}
 			});
 			_.each(sent, function(message) {
 				var thread = _.find(threads, function(thread) {
-					return (thread.to == message.to);
+					return (thread.user == message.to);
 				});
 
 				if (thread) {
 					thread.messages.push(message);
 				} else {
 					threads.push({
-						from: message.from,
-						to: message.to,
+						user: message.to,
 						messages: [message]
 					});
 				}

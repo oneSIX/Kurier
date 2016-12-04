@@ -6,6 +6,10 @@ body {
 	margin: 0;
 }
 
+.container{
+	width: 100%!important;
+}
+
 body {
 	/*font-family: -apple-system, 'Helvetica Neue', Helvetica, sans-serif;*/
 	font-family: 'Roboto', sans-serif;
@@ -40,4 +44,13 @@ header h1 {
 #main-window{
 	position: relative;
 	height: 94vh;
+}
+
+.active {
+    background: #CCC;
+}
+
+.unreadCount {
+	display: block;
+	float: right;
 }
