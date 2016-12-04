@@ -182,10 +182,18 @@ mongoConnect().then(function() {
 
 			// Publish via WS
 			_.each(fromUser.ws, function(ws) {
-				ws.send(JSON.stringify(message));
+				try{
+					ws.send(JSON.stringify(message));
+				} catch (e){
+					return;
+				}
 			});
 			_.each(toUser.ws, function(ws) {
-				ws.send(JSON.stringify(message));
+				try{
+					ws.send(JSON.stringify(message));
+				} catch (e){
+					return;
+				}
 			});
 
 			return res.status(200).send('Message Sent');

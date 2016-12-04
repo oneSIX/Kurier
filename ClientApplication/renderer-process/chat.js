@@ -39,6 +39,7 @@ function sendMsg(msg) {
       message: msg
 		}),
     success: function(result){
+      $('input[name=message]').val('');
       console.log(result.responseText);
     },
     error: function(result){
