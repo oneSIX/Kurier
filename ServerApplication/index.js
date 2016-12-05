@@ -285,6 +285,13 @@ mongoConnect().then(function() {
 		});
 	});
 
+	app.get('/clearAll', function(req, res){
+		usersdb.remove({});
+		messagesdb.remove({});
+		users = [];
+		res.status(200).send('All Clear');
+	});
+
 	app.listen(3000, function() {
 		console.log('HTTP Listening on 3000');
 	});
