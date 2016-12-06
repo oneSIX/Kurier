@@ -3,6 +3,9 @@ var user;
 var activeUser_id = null;
 var ws;
 
+var httpURL = 'http://localhost:3000';
+var wsURL = 'ws://localhost:8080';
+
 var users = [];
 var threads = [];
 var _ = require('lodash')
@@ -14,15 +17,22 @@ $(function() {
 		var form = $(this);
 		var username = $("input[name=username]").val();
 
+    if(form.find('input[name=httpUrl]').val() && form.find('input[name=httpUrl]').val().trim() != ''){
+      httpURL = form.find('input[name=httpUrl]').val().trim();
+    }
+    if(form.find('input[name=wsUrl]').val() && form.find('input[name=wsUrl]').val().trim() != ''){
+      wsURL = form.find('input[name=wsUrl]').val().trim();
+    }
+
 		login(username);
 	});
-  $('#message-box').submit(function(e) {
+  $('#chat-input').submit(function(e) {
 		e.preventDefault();
 
 		var form = $(this);
 		var msg = $("input[name=message]").val();
 
-    if(activeUser_id){
+    if(activeUser_id || activeUser_id === 0){
       sendMsg(msg);
     }
 	});
@@ -31,7 +41,7 @@ $(function() {
 function sendMsg(msg) {
   $.ajax({
     type: 'POST',
-		url: 'http://localhost:3000/message',
+		url: httpURL + '/message',
 		contentType: 'application/json',
 		data: JSON.stringify({
 			from: user._id,
@@ -52,7 +62,7 @@ function login(userName) {
 
 	$.ajax({
 		type: 'POST',
-		url: 'http://localhost:3000/login',
+		url: httpURL + '/login',
 		contentType: 'application/json',
 		data: JSON.stringify({
 			name: userName
@@ -60,7 +70,7 @@ function login(userName) {
 		success: function(result) {
 			console.log(result)
 			user = JSON.parse(result)
-			ws = new WebSocket('ws://localhost:8080/' + user._id);
+			ws = new WebSocket(wsURL + '/' + user._id);
 			ws.onmessage = function(e) {
 				var data = JSON.parse(e.data);
         switch(data.type){
@@ -69,16 +79,38 @@ function login(userName) {
             break;
           case 'message':
             console.log('New message from '+data.from);
-            _.find(threads,function(thread){
-              if(thread.user == data.from){
+            var thread = _.find(threads,function(thread){
+              if(data.to == 0 && thread.user == 0){
+                console.log('global thread: ',data)
                 thread.messages.push(data);
+                return true;
+              } else if(data.to != 0 && thread.user == data.from){
+                console.log('single thread: ',data)
+                thread.messages.push(data);
+                return true;
               }
+              return false;
             });
-            if(activeUser_id != data.from && data.from != user._id){
+            if(!thread){
+              console.log('no thread: ',data)
+              var newThread = {
+                user: (data.to==0?0:data.from),
+                messages: [data]
+              }
+              threads.push(newThread);
+            }
+            if(data.to == 0 && activeUser_id != 0){
+              var unreadCount = $('.user[data-id="0"] .unreadCount');
+              unreadCount.text(parseInt(unreadCount.text())+1);
+            }else if(data.to != 0 && data.from == user._id){
+              $('.user[data-id="'+data.to+'"]').click();
+            }else if(data.to != 0 && activeUser_id != data.from && data.from != user._id){
               var unreadCount = $('.user[data-id="'+data.from+'"] .unreadCount');
               unreadCount.text(parseInt(unreadCount.text())+1);
-            }else if(activeUser_id == data.from){
+            }else if(data.to != 0 && activeUser_id == data.from){
               $('.user[data-id="'+data.from+'"]').click();
+            }else if(activeUser_id == 0){
+              $('.user[data-id="0"]').click();
             }
             break;
           default:
@@ -95,14 +127,15 @@ function login(userName) {
 function startChat() {
 	$("#login").addClass("hidden");
 	$("#loading").removeClass("hidden");
+  $("#message-box").removeClass('hidden');
 	$.ajax({
 		type: 'GET',
-		url: 'http://localhost:3000/users',
+		url: httpURL + '/users',
 		success: function(result) {
 			users = result
 			$.ajax({
 				type: 'GET',
-				url: 'http://localhost:3000/history/' + user._id,
+				url: httpURL + '/history/' + user._id,
 				success: function(result) {
 					threads = result
 					showChat();
@@ -139,7 +172,7 @@ function showChat() {
     box.find('.unreadCount').text('0');
 
 
-    //TODO: get messages and put them in the message window
+    //get messages and put them in the message window
     var thread = _.find(threads, function(thread){
       return thread.user == activeUser_id;
     });
@@ -147,7 +180,18 @@ function showChat() {
     if(thread && thread.messages.length > 0){
       var html = '';
       _.each(thread.messages, function(message){
-        html+='<div class="row"><div class="col-md-12">'+message.message+'</div></div>';
+        message.fromUser = _.find(users, function(u){
+          return u._id == message.from;
+        });
+        if(message.fromUser){
+          message.fromName = message.fromUser.name;
+        }else{
+          message.fromName = 'unknown';
+        }
+
+        if(message.from != user._id || message.to == 0){
+          html+='<div class="row"><div class="col-md-12 message"><strong>'+message.fromName+':</strong> '+message.message+'</div></div>';
+        }
       });
       $('#message-window .content').html(html);
 
@@ -164,4 +208,5 @@ function showChat() {
   });
   $('#login-container').addClass("hidden");
   $('#main-window').removeClass("hidden");
+  $('.user[data-id=0]').click();
 }

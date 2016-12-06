@@ -161,7 +161,7 @@ mongoConnect().then(function() {
 				getUserByID(req.body.from)
 			]);
 		}).spread(function(to, from) {
-			if (!to) {
+			if (!to && req.body.to != 0) {
 				throw new Error('Sending User not Found');
 			}
 			if (!from) {
@@ -180,26 +180,32 @@ mongoConnect().then(function() {
 			var fromUser = _.find(users, function(user) {
 				return user._id == req.body.from;
 			});
-			var toUser = _.find(users, function(user) {
-				return user._id == req.body.to;
+			var toUsers = _.filter(users, function(user) {
+				return user._id == (req.body.to==0?user._id:req.body.to);
 			});
+
+			console.log(toUsers);
 
 			message.type = 'message';
 
 			// Publish via WS
-			_.each(fromUser.ws, function(ws) {
-				try{
-					ws.send(JSON.stringify(message));
-				} catch (e){
-					return;
-				}
-			});
-			_.each(toUser.ws, function(ws) {
-				try{
-					ws.send(JSON.stringify(message));
-				} catch (e){
-					return;
-				}
+			if(req.body.to != 0){
+				_.each(fromUser.ws, function(ws) {
+					try{
+						ws.send(JSON.stringify(message));
+					} catch (e){
+						return;
+					}
+				});
+			}
+			_.each(toUsers, function(toUser){
+				_.each(toUser.ws, function(ws) {
+					try{
+						ws.send(JSON.stringify(message));
+					} catch (e){
+						return;
+					}
+				});
 			});
 
 			return res.status(200).send('Message Sent');
@@ -225,9 +231,10 @@ mongoConnect().then(function() {
 		Promise.try(function() {
 			return Promise.all([
 				getMessagesByReceiver(req.params.id),
-				getMessagesBySender(req.params.id)
+				getMessagesBySender(req.params.id),
+				getGlobalMessages()
 			]);
-		}).spread(function(recieved, sent) {
+		}).spread(function(recieved, sent, globalm) {
 			var threads = [];
 			_.each(recieved, function(message) {
 				var thread = _.find(threads, function(thread) {
@@ -244,15 +251,31 @@ mongoConnect().then(function() {
 				}
 			});
 			_.each(sent, function(message) {
+				if(message.to != 0){
+					var thread = _.find(threads, function(thread) {
+						return (thread.user == message.to);
+					});
+
+					if (thread) {
+						thread.messages.push(message);
+					} else {
+						threads.push({
+							user: message.to,
+							messages: [message]
+						});
+					}
+				}
+			});
+			_.each(globalm, function(message) {
 				var thread = _.find(threads, function(thread) {
-					return (thread.user == message.to);
+					return (thread.user == 0);
 				});
 
 				if (thread) {
 					thread.messages.push(message);
 				} else {
 					threads.push({
-						user: message.to,
+						user: 0,
 						messages: [message]
 					});
 				}
@@ -283,6 +306,13 @@ mongoConnect().then(function() {
 			console.log(err);
 			res.status(500).send(err.message);
 		});
+	});
+
+	app.get('/clearAll', function(req, res){
+		usersdb.remove({});
+		messagesdb.remove({});
+		users = [];
+		res.status(200).send('All Clear');
 	});
 
 	app.listen(3000, function() {
@@ -368,6 +398,13 @@ function getUsers() {
 		usersdb.find().toArray(function(err, users) {
 			if (err == null) {
 				users = _.sortBy(users, ['name'], ['asc']);
+				console.log(users);
+				users.unshift({
+					name:'Global',
+					_id: 0,
+					ws: []
+				});
+				console.log(users);
 				resolve(users);
 			} else {
 				reject(err);
@@ -412,6 +449,21 @@ function getMessagesByReceiver(id) {
 	return new Promise(function(resolve, reject) {
 		messagesdb.find({
 			to: id
+		}).toArray(function(err, messages) {
+			if (err == null) {
+				messages = _.sortBy(messages, ['created_at'], ['asc']);
+				resolve(messages);
+			} else {
+				reject(err);
+			}
+		});
+	});
+}
+
+function getGlobalMessages() {
+	return new Promise(function(resolve, reject) {
+		messagesdb.find({
+			to: 0
 		}).toArray(function(err, messages) {
 			if (err == null) {
 				messages = _.sortBy(messages, ['created_at'], ['asc']);

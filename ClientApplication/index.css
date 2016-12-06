@@ -37,8 +37,9 @@ header h1 {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	height: 6vh;
-
+	height: 5vh;
+	padding-top: .7vh;
+	background: #CCC;
 }
 
 #main-window{
@@ -46,11 +47,34 @@ header h1 {
 	height: 94vh;
 }
 
+#user-window {
+	height: 100vh;
+	background: #ECECEC;
+}
+
 .active {
-    background: #CCC;
+    background: #FFF;
 }
 
 .unreadCount {
 	display: block;
 	float: right;
+}
+
+.message {
+	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.13);
+	margin: 4px 6px;
+	border: 1px solid #CCC;
+	width: 90%;
+	padding: 5px 14px;
+}
+
+#logout-window {
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	z-index: 999;
+}
+#logout-window a{
+	cursor: pointer;
 }

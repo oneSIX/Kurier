@@ -19,7 +19,6 @@ function createMainWindow() {
 	const win = new electron.BrowserWindow({
 		x: 0,
 		y: 0,
-		frame: false,
 	});
 	win.maximize();
 	win.loadURL(`file://${__dirname}/index.html`);
