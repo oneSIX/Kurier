@@ -215,9 +215,17 @@ function showChat() {
 function toast(data){
 	console.log('From: ' + data.from + '<br>');
 	var ipc = require("electron").ipcRenderer;
+	data.fromUser = _.find(users, function(u){
+		return u._id == data.from;
+	});
+	if(data.fromUser){
+		data.fromName = data.fromUser.name;
+	}else{
+		data.fromName = 'unknown';
+	}
 	var msg = {
 			title : 'New Message',
-			message : 'From: ' + data.from + '<br>',
+			message : 'From: ' + data.fromName + '<br>',
 			detail : "",
 			width : 440,
 			// height : 160, window will be autosized
