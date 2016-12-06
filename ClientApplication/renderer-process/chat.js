@@ -16,13 +16,13 @@ $(function() {
 
 		login(username);
 	});
-  $('#message-box').submit(function(e) {
+  $('#chat-input').submit(function(e) {
 		e.preventDefault();
 
 		var form = $(this);
 		var msg = $("input[name=message]").val();
 
-    if(activeUser_id){
+    if(activeUser_id || activeUser_id === 0){
       sendMsg(msg);
     }
 	});
@@ -69,18 +69,36 @@ function login(userName) {
             break;
           case 'message':
             console.log('New message from '+data.from);
-            _.find(threads,function(thread){
+            var thread = _.find(threads,function(thread){
+              console.log(data.to==0,thread.user==0,data.to == 0 && thread.user == 0);
               if(data.to == 0 && thread.user == 0){
+                console.log('global thread: ',data)
                 thread.messages.push(data);
-              } else if(thread.user == data.from){
+                return true;
+              } else if(data.to != 0 && thread.user == data.from){
+                console.log('single thread: ',data)
                 thread.messages.push(data);
+                return true;
               }
+              return false;
             });
-            if(activeUser_id != data.from && data.from != user._id){
+            if(!thread){
+              console.log('no thread: ',data)
+              threads.push({
+                user: (data.to==0?0:data.from),
+                messages: [data]
+              });
+            }
+            if(data.to == 0 && activeUser_id != 0){
+              var unreadCount = $('.user[data-id="0"] .unreadCount');
+              unreadCount.text(parseInt(unreadCount.text())+1);
+            }else if(data.to != 0 && activeUser_id != data.from && data.from != user._id){
               var unreadCount = $('.user[data-id="'+data.from+'"] .unreadCount');
               unreadCount.text(parseInt(unreadCount.text())+1);
-            }else if(activeUser_id == data.from){
+            }else if(data.to != 0 && activeUser_id == data.from){
               $('.user[data-id="'+data.from+'"]').click();
+            }else if(activeUser_id == 0){
+              $('.user[data-id="0"]').click();
             }
             break;
           default:
@@ -141,7 +159,7 @@ function showChat() {
     box.find('.unreadCount').text('0');
 
 
-    //TODO: get messages and put them in the message window
+    //get messages and put them in the message window
     var thread = _.find(threads, function(thread){
       return thread.user == activeUser_id;
     });
