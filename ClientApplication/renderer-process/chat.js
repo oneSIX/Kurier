@@ -3,6 +3,9 @@ var user;
 var activeUser_id = null;
 var ws;
 
+var httpURL = 'http://localhost:3000';
+var wsURL = 'ws://localhost:8080';
+
 var users = [];
 var threads = [];
 var _ = require('lodash')
@@ -13,6 +16,13 @@ $(function() {
 
 		var form = $(this);
 		var username = $("input[name=username]").val();
+
+    if(form.find('input[name=httpURL]').val() && form.find('input[name=httpURL]').val().trim() != ''){
+      httpURL = form.find('input[name=httpURL]').val().trim();
+    }
+    if(form.find('input[name=wsURL]').val() && form.find('input[name=wsURL]').val().trim() != ''){
+      httpURL = form.find('input[name=wsURL]').val().trim();
+    }
 
 		login(username);
 	});
@@ -31,7 +41,7 @@ $(function() {
 function sendMsg(msg) {
   $.ajax({
     type: 'POST',
-		url: 'http://localhost:3000/message',
+		url: httpURL + '/message',
 		contentType: 'application/json',
 		data: JSON.stringify({
 			from: user._id,
@@ -52,7 +62,7 @@ function login(userName) {
 
 	$.ajax({
 		type: 'POST',
-		url: 'http://localhost:3000/login',
+		url: httpURL + '/login',
 		contentType: 'application/json',
 		data: JSON.stringify({
 			name: userName
@@ -60,7 +70,7 @@ function login(userName) {
 		success: function(result) {
 			console.log(result)
 			user = JSON.parse(result)
-			ws = new WebSocket('ws://localhost:8080/' + user._id);
+			ws = new WebSocket(wsURL + '/' + user._id);
 			ws.onmessage = function(e) {
 				var data = JSON.parse(e.data);
         switch(data.type){
@@ -70,7 +80,6 @@ function login(userName) {
           case 'message':
             console.log('New message from '+data.from);
             var thread = _.find(threads,function(thread){
-              console.log(data.to==0,thread.user==0,data.to == 0 && thread.user == 0);
               if(data.to == 0 && thread.user == 0){
                 console.log('global thread: ',data)
                 thread.messages.push(data);
@@ -84,14 +93,17 @@ function login(userName) {
             });
             if(!thread){
               console.log('no thread: ',data)
-              threads.push({
+              var newThread = {
                 user: (data.to==0?0:data.from),
                 messages: [data]
-              });
+              }
+              threads.push(newThread);
             }
             if(data.to == 0 && activeUser_id != 0){
               var unreadCount = $('.user[data-id="0"] .unreadCount');
               unreadCount.text(parseInt(unreadCount.text())+1);
+            }else if(data.to != 0 && data.from == user._id){
+              $('.user[data-id="'+data.to+'"]').click();
             }else if(data.to != 0 && activeUser_id != data.from && data.from != user._id){
               var unreadCount = $('.user[data-id="'+data.from+'"] .unreadCount');
               unreadCount.text(parseInt(unreadCount.text())+1);
@@ -115,14 +127,15 @@ function login(userName) {
 function startChat() {
 	$("#login").addClass("hidden");
 	$("#loading").removeClass("hidden");
+  $("#message-box").removeClass('hidden');
 	$.ajax({
 		type: 'GET',
-		url: 'http://localhost:3000/users',
+		url: httpURL + '/users',
 		success: function(result) {
 			users = result
 			$.ajax({
 				type: 'GET',
-				url: 'http://localhost:3000/history/' + user._id,
+				url: httpURL + '/history/' + user._id,
 				success: function(result) {
 					threads = result
 					showChat();
@@ -167,7 +180,18 @@ function showChat() {
     if(thread && thread.messages.length > 0){
       var html = '';
       _.each(thread.messages, function(message){
-        html+='<div class="row"><div class="col-md-12">'+message.message+'</div></div>';
+        message.fromUser = _.find(users, function(u){
+          return u._id == message.from;
+        });
+        if(message.fromUser){
+          message.fromName = message.fromUser.name;
+        }else{
+          message.fromName = 'unknown';
+        }
+
+        if(message.from != user._id || message.to == 0){
+          html+='<div class="row"><div class="col-md-12 message"><strong>'+message.fromName+':</strong> '+message.message+'</div></div>';
+        }
       });
       $('#message-window .content').html(html);
 
@@ -184,4 +208,5 @@ function showChat() {
   });
   $('#login-container').addClass("hidden");
   $('#main-window').removeClass("hidden");
+  $('.user[data-id=0]').click();
 }

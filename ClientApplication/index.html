@@ -27,8 +27,8 @@
 		<header>
 			<h1>Kurier</h1>
 			<form id="login" style="margin-top:40px">
-				<input class="form-control" type="text" style="margin-bottom:15px" placeholder="HTTP URL" name="http-url">
-					<input class="form-control" type="text" style="margin-bottom:15px" placeholder="WebSocket URL" name="ws-url">
+				<input class="form-control" type="text" style="margin-bottom:15px" placeholder="HTTP URL" name="httpUrl">
+					<input class="form-control" type="text" style="margin-bottom:15px" placeholder="WebSocket URL" name="wsUrl">
 					<input class="form-control" type="text" style="margin-bottom:15px" placeholder="Username" name="username">
 				<button type="submit" class="btn btn-primary btn-block">Login</button>
 			</form>
@@ -38,12 +38,17 @@
 
 		</header>
 	</div>
-	<div class="container hidden" id="main-window" style="margin-top: 10px; margin-bottom: 10px; margin-left:10px; margin-right: 10px">
+	<div class="container hidden" id="main-window">
+		<div id="logout-window">
+			<a class="btn btn-primary" onClick="window.location.reload();">
+				Sign Out <i class="fa fa-sign-out"></i>
+			</a>
+		</div>
 		<div class="row">
-			<div class="col-md-2" id="user-window">
+			<div class="col-md-1" id="user-window">
 			</div>
 
-			<div class="col-md-10" id="message-window">
+			<div class="col-md-11" id="message-window">
 				<div class="none">
 					<h4>no messages</h4>
 				</div>
@@ -56,18 +61,17 @@
 
 			</div>
 		</div>
-		<div id="message-box">
-			<form id="chat-input" class="col-md-12" >
-				<div class="input-group">
-					<input class="form-control" type="text" placeholder="Message" name="message">
-					<span class="input-group-btn">
-			<button type="submit" class="btn btn-primary">Send <i class="fa fa-send"></i></button>
-			</span>
-				</div>
-			</form>
-		</div>
 	</div>
-
+	<div id="message-box" class="hidden">
+		<form id="chat-input" class="col-md-12" >
+			<div class="input-group">
+				<input class="form-control" type="text" placeholder="Message" name="message">
+				<span class="input-group-btn">
+		<button type="submit" class="btn btn-primary">Send <i class="fa fa-send"></i></button>
+		</span>
+			</div>
+		</form>
+	</div>
 </body>
 
 </html>

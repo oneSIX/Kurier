@@ -189,13 +189,15 @@ mongoConnect().then(function() {
 			message.type = 'message';
 
 			// Publish via WS
-			_.each(fromUser.ws, function(ws) {
-				try{
-					ws.send(JSON.stringify(message));
-				} catch (e){
-					return;
-				}
-			});
+			if(req.body.to != 0){
+				_.each(fromUser.ws, function(ws) {
+					try{
+						ws.send(JSON.stringify(message));
+					} catch (e){
+						return;
+					}
+				});
+			}
 			_.each(toUsers, function(toUser){
 				_.each(toUser.ws, function(ws) {
 					try{
@@ -261,7 +263,7 @@ mongoConnect().then(function() {
 							user: message.to,
 							messages: [message]
 						});
-					}	
+					}
 				}
 			});
 			_.each(globalm, function(message) {
