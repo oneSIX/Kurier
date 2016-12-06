@@ -17,11 +17,11 @@ $(function() {
 		var form = $(this);
 		var username = $("input[name=username]").val();
 
-    if(form.find('input[name=httpURL]').val() && form.find('input[name=httpURL]').val().trim() != ''){
-      httpURL = form.find('input[name=httpURL]').val().trim();
+    if(form.find('input[name=httpUrl]').val() && form.find('input[name=httpUrl]').val().trim() != ''){
+      httpURL = form.find('input[name=httpUrl]').val().trim();
     }
-    if(form.find('input[name=wsURL]').val() && form.find('input[name=wsURL]').val().trim() != ''){
-      httpURL = form.find('input[name=wsURL]').val().trim();
+    if(form.find('input[name=wsUrl]').val() && form.find('input[name=wsUrl]').val().trim() != ''){
+      wsURL = form.find('input[name=wsUrl]').val().trim();
     }
 
 		login(username);
