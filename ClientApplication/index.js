@@ -3,6 +3,9 @@ const electron = require('electron');
 
 const app = electron.app;
 
+var Toaster = require('electron-toaster');
+var toaster = new Toaster();
+
 // adds debug features like hotkeys for triggering dev tools and reload
 require('electron-debug')();
 
@@ -41,6 +44,7 @@ app.on('activate', () => {
 
 app.on('ready', () => {
 	mainWindow = createMainWindow();
+	toaster.init(mainWindow);
 });
 
 
