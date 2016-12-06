@@ -79,6 +79,7 @@ function login(userName) {
             break;
           case 'message':
             console.log('New message from '+data.from);
+						toast(data);
             var thread = _.find(threads,function(thread){
               if(data.to == 0 && thread.user == 0){
                 console.log('global thread: ',data)
@@ -209,4 +210,19 @@ function showChat() {
   $('#login-container').addClass("hidden");
   $('#main-window').removeClass("hidden");
   $('.user[data-id=0]').click();
+}
+
+function toast(data){
+	console.log('From: ' + data.from + '<br>');
+	var ipc = require("electron").ipcRenderer;
+	var msg = {
+			title : 'New Message',
+			message : 'From: ' + data.from + '<br>',
+			detail : "",
+			width : 440,
+			// height : 160, window will be autosized
+			timeout : 6000,
+			focus: true // set focus back to main window
+	};
+	ipc.send('electron-toaster-message', msg);
 }
