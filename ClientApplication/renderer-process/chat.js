@@ -70,7 +70,9 @@ function login(userName) {
           case 'message':
             console.log('New message from '+data.from);
             _.find(threads,function(thread){
-              if(thread.user == data.from){
+              if(data.to == 0 && thread.user == 0){
+                thread.messages.push(data);
+              } else if(thread.user == data.from){
                 thread.messages.push(data);
               }
             });

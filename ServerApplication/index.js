@@ -161,7 +161,7 @@ mongoConnect().then(function() {
 				getUserByID(req.body.from)
 			]);
 		}).spread(function(to, from) {
-			if (!to) {
+			if (!to && req.body.to != 0) {
 				throw new Error('Sending User not Found');
 			}
 			if (!from) {
@@ -180,8 +180,8 @@ mongoConnect().then(function() {
 			var fromUser = _.find(users, function(user) {
 				return user._id == req.body.from;
 			});
-			var toUser = _.find(users, function(user) {
-				return user._id == req.body.to;
+			var toUsers = _.filter(users, function(user) {
+				return user._id == (req.body.to==0?user._id:req.body.to);
 			});
 
 			message.type = 'message';
@@ -194,12 +194,14 @@ mongoConnect().then(function() {
 					return;
 				}
 			});
-			_.each(toUser.ws, function(ws) {
-				try{
-					ws.send(JSON.stringify(message));
-				} catch (e){
-					return;
-				}
+			_.each(toUsers, function(toUser){
+				_.each(toUser.ws, function(ws) {
+					try{
+						ws.send(JSON.stringify(message));
+					} catch (e){
+						return;
+					}
+				});
 			});
 
 			return res.status(200).send('Message Sent');
@@ -375,6 +377,11 @@ function getUsers() {
 		usersdb.find().toArray(function(err, users) {
 			if (err == null) {
 				users = _.sortBy(users, ['name'], ['asc']);
+				users.unshift({
+					name:'Global',
+					_id: 0,
+					ws: []
+				})
 				resolve(users);
 			} else {
 				reject(err);
