@@ -4,9 +4,9 @@ var _ = require('lodash'),
 	bodyParser = require('body-parser'),
 	Promise = require('bluebird'),
 	MongoClient = require('mongodb').MongoClient,
-	// url = 'mongodb://adminuser:hunter12@ds119748.mlab.com:19748/kurier-db',
+	url = 'mongodb://adminuser:hunter12@ds119748.mlab.com:19748/kurier-db',
 	// for local hosted DB below otherwise mlab hosted DB above
-	url = 'mongodb://localhost:27017/kurier',
+	// url = 'mongodb://localhost:27017/kurier',
 	WebSocketServer = require('ws').Server,
 	users = [],
 	wss, db, usersdb, messagesdb;
