@@ -2,6 +2,7 @@
 var user;
 var activeUser_id = null;
 var ws;
+var first = true;
 
 var httpURL = 'http://localhost:3000';
 var wsURL = 'ws://localhost:8080';
@@ -84,6 +85,10 @@ function login(userName) {
                 console.log('global thread: ',data)
                 thread.messages.push(data);
                 return true;
+              } else if(data.from == user._id && thread.user == data.to){
+                console.log('single thread: ',data)
+                thread.messages.push(data);
+                return true;
               } else if(data.to != 0 && thread.user == data.from){
                 console.log('single thread: ',data)
                 thread.messages.push(data);
@@ -155,9 +160,21 @@ function showChat() {
   var html = '';
   _.each(users, function(u){
     if(u._id != user._id){
+      if(first){
+        if(!_.find(threads, function(thread){
+          return thread.user == u._id;
+        })){
+          threads.push({
+            user: u._id,
+            messages: []
+          });
+        }
+      }
+
       html+= '<div class="row user" data-id="'+u._id+'"><div class="col-md-4"><i class="fa fa-user"></i></div><div class="col-md-8">'+u.name+'<span class="unreadCount">0</span></div></div>';
     }
-  })
+  });
+  first = false;
   $('#user-window').html(html);
   $('.user').click(function(){
     $('#message-window .none').addClass('hidden');
@@ -189,7 +206,7 @@ function showChat() {
           message.fromName = 'unknown';
         }
 
-        if(message.from != user._id || message.to == 0){
+        if(message.from != user._id || message.to == 0 || message.from == user._id){
           html+='<div class="row"><div class="col-md-12 message"><strong>'+message.fromName+':</strong> '+message.message+'</div></div>';
         }
       });
